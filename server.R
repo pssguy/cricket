@@ -38,6 +38,8 @@ shinyServer(function(input, output, session) {
     print(glimpse(bowler))
     print(glimpse(batter))
     
+    write_csv(bowler,"bowlerTest.csv")
+    
     
     info=list(playerId=playerId,batter=batter,bowler=bowler)
     return(info)

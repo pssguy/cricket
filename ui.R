@@ -45,7 +45,7 @@ dashboardPage(
         
         fluidRow(
           column(
-            width = 4,
+            width = 3,
             box(
               width = 12,title = "Image",solidHeader = TRUE,status = 'success',
               collapsible = TRUE, collapsed = FALSE,
@@ -62,7 +62,7 @@ dashboardPage(
             )
           ),
           column(
-            width = 5,
+            width = 6,
             box(
               width = 12,title = "CricInfo Summary",solidHeader = TRUE,status = 'success',
               collapsible = TRUE, collapsed = FALSE,
@@ -79,10 +79,10 @@ dashboardPage(
                  infoBoxOutput("testsBox", width = 12)),
           
           column(width = 3,
-                 infoBoxOutput("seasonsBox", width = 12)),
+                 infoBoxOutput("runsBox", width = 12)),
           
           column(width = 3,
-                 infoBoxOutput("appsBox", width = 12))
+                 infoBoxOutput("wicketsBox", width = 12))
         ),
         fluidRow(
           column(width = 3,
