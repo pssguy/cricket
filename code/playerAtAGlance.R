@@ -16,17 +16,17 @@ playerData <- reactive({
                  rbind(batTests) %>% 
                  unique())
   
-  print(tests)
+#print(tests)
   
   sumRuns <- batter %>% 
     summarize(totRuns=sum(extract_numeric(batter$Runs), na.rm=T)) #5200
-  print(sumRuns)
+#print(sumRuns)
   
   sumOuts <- batter %>% 
     filter(Dismissal!="not out"&Dismissal!="-") %>% 
     nrow()
   
-  batAv <- round(sumRuns/sumOuts,2)
+  batAv <- round(sumRuns/sumOuts,1)
   
   showBat <- paste0(sumRuns," - ",batAv)
   

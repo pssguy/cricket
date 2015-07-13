@@ -58,7 +58,8 @@ dashboardPage(
             box(
               width = 12,title = "Birth Place",solidHeader = TRUE,status = 'success',
               collapsible = TRUE, collapsed = FALSE,
-              leafletOutput("playerBirthplace", height = 200)
+              textOutput("birthDate"),
+              leafletOutput("birthPlace", height = 200)
             )
           ),
           column(
