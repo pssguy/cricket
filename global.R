@@ -26,10 +26,14 @@ library(cricketr)
 ## prob load file and update daily??
 
 testPlayers <- read_csv("allTestPlayers.csv")
+testPlayers <- testPlayers %>% 
+  arrange(player)
 
 playerChoice <- testPlayers$playerId
-names(playerChoice) <- testPlayers$playerName
+names(playerChoice) <- testPlayers$player
 
-print(head(playerChoice))
+#print(head(playerChoice))
+
+countryChoice <- sort(unique(testPlayers$teamName))
 
 print("finished global")

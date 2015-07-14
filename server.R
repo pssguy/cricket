@@ -4,10 +4,17 @@ shinyServer(function(input, output, session) {
   
  
   
-  # check
+  output$country <- renderUI ({
+    selectInput("country", "Select Countries", countryChoice, multiple=TRUE, selected = "India")
+  })
+  
   output$a <- renderUI({
-
-    selectizeInput("player","Select Player",playerChoice,  options=list(maxOptions=10000))
+    if (is.null(input$country)) return()
+    
+    theChoice <- testPlayers[testPlayers$teamName %in% input$country,]$playerId
+    names(theChoice) <- testPlayers[testPlayers$teamName %in% input$country,]$player
+    
+    selectizeInput("player","Select Player",theChoice,  options=list(maxOptions=10000))
     
   })
   # outlying code

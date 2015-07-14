@@ -5,6 +5,7 @@ dashboardPage(
   dashboardHeader(title = "Test Cricket"),
   
   dashboardSidebar(
+    uiOutput("country"),
     uiOutput("a"),
     
     
@@ -54,7 +55,7 @@ dashboardPage(
             )
           ),
           column(
-            width = 3,
+            width = 4,
             box(
               width = 12,title = "Birth Place",solidHeader = TRUE,status = 'success',
               collapsible = TRUE, collapsed = FALSE,
@@ -63,7 +64,7 @@ dashboardPage(
             )
           ),
           column(
-            width = 6,
+            width = 5,
             box(
               width = 12,title = "CricInfo Summary",solidHeader = TRUE,status = 'success',
               collapsible = TRUE, collapsed = FALSE,
