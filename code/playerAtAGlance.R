@@ -27,7 +27,11 @@ playerData <- reactive({
     nrow()
   
   batAv <- round(sumRuns/sumOuts,1)
-  
+  if(is.nan(summaryBowling$batAv)) { 
+    showBat <- "0 - 0"
+  } else {
+    showBat <- paste0(sumRuns," - ",batAv)
+  }
   showBat <- paste0(sumRuns," - ",batAv)
   
   
@@ -35,9 +39,13 @@ playerData <- reactive({
     summarize(totRuns=sum(extract_numeric(bowler$Runs), na.rm=T),
               totWickets=sum(extract_numeric(bowler$Wkts), na.rm=T),
               bowlingAv = round(totRuns/totWickets,1))
-  
+  print("check")
+  print(summaryBowling$bowlingAv)
+  if(is.nan(summaryBowling$bowlingAv)) { 
+    showBowl <- "0 - 0"
+    } else {
   showBowl <- paste0(summaryBowling$totWickets," - ",summaryBowling$bowlingAv)
-  
+    }
   info = list(tests=tests, showBat=showBat, showBowl= showBowl)
   return(info)
 })
