@@ -2,10 +2,11 @@
 
 output$birthDate <- renderText({
   if(is.null(playerPage())) return()
+  if(is.null(input$player)) return()
   
   print(playerPage()$birthDoc)
   print("that was birthdoc")
-  playerPage()$birthPlace
+  playerPage()$birthDoc
 })
 
 

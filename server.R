@@ -2,10 +2,10 @@
 
 shinyServer(function(input, output, session) {
   
- 
-  
   output$country <- renderUI ({
+    inputPanel(
     selectInput("country", "Select Countries", countryChoice, multiple=TRUE, selected = "India")
+  )
   })
   
   output$a <- renderUI({
@@ -14,7 +14,10 @@ shinyServer(function(input, output, session) {
     theChoice <- testPlayers[testPlayers$teamName %in% input$country,]$playerId
     names(theChoice) <- testPlayers[testPlayers$teamName %in% input$country,]$player
     
-    selectizeInput("player","Select Player",theChoice,  options=list(maxOptions=10000))
+    inputPanel(
+    selectizeInput("player","Select Player",theChoice,  options=list(maxOptions=10000)),
+    actionButton("getPlayer","Get Data")
+    )
     
   })
   # outlying code
@@ -25,8 +28,12 @@ shinyServer(function(input, output, session) {
   
   ## basic processing
   
-  data <- reactive({
+  data <- eventReactive(input$getPlayer,{
     
+    
+    input$getPlayer
+    
+    if (is.null(input$country)) return()
     if(is.null(input$player)) return()
     #print("enter data reactive")
     playerId <- input$player
@@ -103,7 +110,7 @@ print(birthPlace)
 #     #print("imageDoc")
 #     #print(imageDoc)
     
-    info=list(imageDoc=imageDoc, summaryDoc=summaryDoc, birthPlace=birthPlace,birthDate=birthDate)
+    info=list(imageDoc=imageDoc, summaryDoc=summaryDoc, birthPlace=birthPlace,birthDate=birthDate, birthDoc=birthDoc)
     return(info)
     
   })

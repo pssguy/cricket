@@ -3,6 +3,7 @@
 
 
 output$test <- renderText({
+  if(is.null(input$player)) return()
   if (is.null(data())) return
   data()$playerId
 })
@@ -10,10 +11,13 @@ output$test <- renderText({
 
 output$playerSummary <- renderText({
   
-  #print("enter summary")
+  print("enter summary")
+  if (is.null(input$country)) return()
+  print(input$player)
+  print(playerPage()$summaryDoc)
   if (is.null(input$player)) return
   if (is.null(playerPage()$summaryDoc)) return
-  #print("entered summary")
+  print("entered summary")
   
   if (!is.null(playerPage()$summaryDoc)) {
     summary <-  playerPage()$summaryDoc %>% 
