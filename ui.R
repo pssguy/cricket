@@ -21,7 +21,7 @@ dashboardPage(
       menuItem(
         "Players", tabName = "players",icon = icon("table"),
         menuSubItem("At A Glance", tabName = "pl_glance"),
-        menuSubItem("Batting", tabName = "pl_batting"),
+        menuSubItem("Batting", tabName = "pl_batting", selected=T),
         menuSubItem("Info", tabName = "info",icon = icon("info"))
         
         
@@ -118,12 +118,16 @@ dashboardPage(
             fluidRow(
               tabBox(
                 # The id lets us use input$tabset1 on the server to find the current tab
-                id = "tabset1", height = "500px",
+                id = "tabset1", height = "500px",title="Batting Charts", width=12,side="right",
+                tabPanel("Runs by Date",
+                         ggvisOutput("pl_batByDateChart")), # could add a table here
                 tabPanel("Strike rate",
                          ggvisOutput("pl_strikeRate")),
-                tabPanel("Another"),
                 
-                tabPanel("Yet Another")
+                
+                tabPanel("By Opposition",
+                         ggvisOutput("pl_batOppCharts"))
+                
               ) #tabbox
               ) # fluidrow
             
