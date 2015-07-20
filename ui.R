@@ -127,6 +127,8 @@ dashboardPage(
                 
                 tabPanel("By Opposition",
                          ggvisOutput("pl_batOppCharts")),
+                tabPanel("Boundary %",
+                        ggvisOutput("pl_batBoundaries")),
                 tabPanel("Raw Data",
                          DT::dataTableOutput("pl_batRaw"))
                 

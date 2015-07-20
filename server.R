@@ -131,15 +131,19 @@ birthPlace <- birthDoc %>%
   #  print(test)
     
     colnames(batter)[12] <- "Date"
-  #  print(glimpse(batter))
+    print("beforeboundaries")
+    print(glimpse(batter))
     df <-  batter %>% 
       filter(Runs!="DNB"&Runs!="TDNB") %>% 
       mutate(Runs=str_replace(Runs,"[*]","")) %>% 
       mutate(Runs = as.integer(Runs),SR= as.numeric(SR)) %>% 
       mutate(Opposition=str_replace(Opposition,"v ",""))
-    
-#     print("glimpsedf")
-#     print(glimpse(df))
+    colnames(df)[4] <- "Fours"
+    df$Fours <- as.integer(df$Fours)
+    colnames(df)[5] <- "Sixes"
+    df$Sixes <- as.integer(df$Sixes)
+     print("glimpsedf")
+   print(glimpse(df))
     
     df$id <- 1:nrow(df)
     print(test)

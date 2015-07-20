@@ -64,7 +64,35 @@ dfOpp  %>%
    add_axis("x",title= "Batting Average") %>% 
    add_axis("y", title= "Average Strike Rate") %>% 
     bind_shiny("pl_batOppCharts") 
+
+### % by boundaries
+#print(glimpse(df))
+
+write_csv(df,"testdf.csv")
+
+df_Boundaries <- df %>% 
+  filter(!is.na(Fours)) %>% 
+  mutate(pc=100*(Fours*4+Sixes*6)/Runs) 
+  
+  print(glimpse(df_Boundaries))
+  
+   df_Boundaries$id  <- 1:nrow(df_Boundaries)
+#   
+  boundary_values <- function(x) {
+    if (is.null(x))
+      return(NULL)
+    row <- df_Boundaries[df_Boundaries$id == x$id,c("Opposition","Date","Runs","Fours","Sixes","pc") ]
+    paste0(names(row),": ",format(row), collapse = "<br />")
+  }
+  
+df_Boundaries %>% 
+    ggvis(~Runs,~pc, key:= ~id) %>% 
+  layer_points(fill = ~Opposition) %>% 
+ add_tooltip(boundary_values, "hover") %>% 
+    bind_shiny("pl_batBoundaries")
+
 })
+
 
 
 ## rawData
@@ -78,7 +106,9 @@ output$pl_batRaw <- DT::renderDataTable({
     DT::datatable()
 #     DT::datatable(rownames = checkboxRows(., checked=c(1:5)), escape = -1,
 #                   ,options= list(paging = FALSE, searching = FALSE,info=FALSE, order = list(list(3, 'desc')))) 
-#   
-  
+#   http://rstudio.github.io/DT/extensions.html but looks as though need to set up www directory first
+#   extensions = 'TableTools', options = list(
+#     dom = 'T<"clear">lfrtip',
+#     tableTools = list(sSwfPath = copySWF('www'))
   
 })
