@@ -126,7 +126,9 @@ dashboardPage(
                 
                 
                 tabPanel("By Opposition",
-                         ggvisOutput("pl_batOppCharts"))
+                         ggvisOutput("pl_batOppCharts")),
+                tabPanel("Raw Data",
+                         DT::dataTableOutput("pl_batRaw"))
                 
               ) #tabbox
               ) # fluidrow

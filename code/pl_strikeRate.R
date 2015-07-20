@@ -65,3 +65,20 @@ dfOpp  %>%
    add_axis("y", title= "Average Strike Rate") %>% 
     bind_shiny("pl_batOppCharts") 
 })
+
+
+## rawData
+
+output$pl_batRaw <- DT::renderDataTable({
+  
+  if(is.null(batterData())) return()
+ 
+  batterData()$df %>% 
+    select(Date,Opposition,Ground,Inns,Order=Pos,Dismissal,Runs,Mins,BF,SR) %>% 
+    DT::datatable()
+#     DT::datatable(rownames = checkboxRows(., checked=c(1:5)), escape = -1,
+#                   ,options= list(paging = FALSE, searching = FALSE,info=FALSE, order = list(list(3, 'desc')))) 
+#   
+  
+  
+})
