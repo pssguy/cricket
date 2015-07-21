@@ -1,159 +1,152 @@
 
 
+
 shinyServer(function(input, output, session) {
+  ## create input panels
   
   output$country <- renderUI ({
     inputPanel(
-    selectInput("country", "Select Country(ies)", countryChoice, multiple=TRUE, selected = "India")
-  )
+      selectInput(
+        "country", "Select Country(ies)", countryChoice, multiple = TRUE, selected = "India"
+      )
+    )
   })
   
   output$a <- renderUI({
-    if (is.null(input$country)) return()
+    if (is.null(input$country))
+      return()
     
-    theChoice <- testPlayers[testPlayers$teamName %in% input$country,]$playerId
-    names(theChoice) <- testPlayers[testPlayers$teamName %in% input$country,]$player
+    theChoice <-
+      testPlayers[testPlayers$teamName %in% input$country,]$playerId
+    names(theChoice) <-
+      testPlayers[testPlayers$teamName %in% input$country,]$player
     
     inputPanel(
-    selectizeInput("player","Select or Type Player's Name",theChoice,  options=list(maxOptions=10000)),
-    actionButton("getPlayer","Get Data")
+      selectizeInput(
+        "player","Select or Type Player's Name",theChoice,  options = list(maxOptions =
+                                                                             10000)
+      ),
+      actionButton("getPlayer","Get Data (takes a few seconds)")
     )
     
   })
-  # outlying code
-  source("code/playerPix.R", local=TRUE)
-  source("code/playerSummary.R", local=TRUE)
-  source("code/playerAtAGlance.R", local=TRUE)
-  source("code/playerBirth.R", local=TRUE)
-   source("code/playerBatting.R", local=TRUE)
+  
   
   ## basic processing
   
   data <- eventReactive(input$getPlayer,{
-    
-    print(input$getPlayer)
     input$getPlayer
-    #print(input$getPlayer)
-    if (is.null(input$country)) return()
-    if(is.null(input$player)) return()
-    #print("enter data reactive")
+    
+    if (is.null(input$country))
+      return()
+    if (is.null(input$player))
+      return()
+    
     playerId <- input$player
-    ##print(playerId)
     
     
-    ## use package
-    bowler<- getPlayerData(profile=input$player,file="tempBowl.csv",type="bowling",homeOrAway=c(1,2),
-                           result=c(1,2,4))
-    #print(Sys.time())
-    batter<- getPlayerData(profile=input$player,file="tempBat.csv",type="batting",homeOrAway=c(1,2),
-                           result=c(1,2,4))
-    #print(Sys.time())
+    # download bowling data - though not implemented yet
+    bowler <- getPlayerData(profile = input$player,type = "bowling")
     
-    ##print(glimpse(bowler))
-    ##print(glimpse(batter))
+    batter <- getPlayerData(profile = input$player,type = "batting")
+    
+    
+    ## cannot have space in colname
     colnames(batter)[12] <- "startDate"
-    colnames(bowler)[10] <- "startDate" # might be issue with this had 11 before may differ if actually bowled
-    ##print(glimpse(bowler))
-    ##print(glimpse(batter))
-    
-    write_csv(bowler,"bowlerTest.csv")
+    colnames(bowler)[10] <- "startDate"
     
     
-    info=list(playerId=playerId,batter=batter,bowler=bowler)
+    
+    
+    info = list(playerId = playerId,batter = batter,bowler = bowler)
     return(info)
     
   })
   
-  playerPage <- reactive({
+  ## obtain more info from Cricinfo not provided by package
+  # playerPage <- reactive({
+  playerPage <- eventReactive(data(),{
+    #if (is.null(data())) return
     
-    if (is.null(data())) return
-    print("entered playerPage")
     
-    v <- paste0("http://www.espncricinfo.com/england/content/player/",data()$playerId,".html#statistics")
-    ##print(v) #"http://www.espncricinfo.com/england/content/player/4091.html#statistics"
+    v <-
+      paste0(
+        "http://www.espncricinfo.com/england/content/player/",data()$playerId,".html#statistics"
+      )
+    
     doc <- html(v)
-   # doc <-html("http://www.espncricinfo.com/england/content/player/4091.html#statistics")
     
     
-    imageDoc <- doc %>% 
-      html_node("#ciHomeContentlhs img") 
     
-   
-    summaryDoc <- doc %>% 
-         html_node(".divSeparator+ .ciPlayerinformationtxt span")
-    if(is.null(summaryDoc)){
-    summaryDoc <- doc %>% 
-      html_node(".ciPlayerprofiletext1")
+    imageDoc <- doc %>%
+      html_node("#ciHomeContentlhs img")
+    
+    ## There are a couple of different sources of summary information
+    summaryDoc <- doc %>%
+      html_node(".divSeparator+ .ciPlayerinformationtxt span")
+    
+    if (is.null(summaryDoc)) {
+      summaryDoc <- doc %>%
+        html_node(".ciPlayerprofiletext1")
     }
     
-    birthDoc <- doc %>% 
-        html_node(".ciPlayerinformationtxt:nth-child(2) span") %>% 
+    birthDoc <- doc %>%
+      html_node(".ciPlayerinformationtxt:nth-child(2) span") %>%
       html_text(trim = TRUE)
-    #print(birthDoc)
     
-    #July 3, 1851, Woolwich, Kent, England"
+    # create Birth information
+    a <-  str_split(birthDoc,",")
     
-    # test <- "July 3, 1851, Woolwich, Kent, England"
-    
-  a <-  str_split(birthDoc,",")
     birthDate <- paste0(a[[1]][1],",",a[[1]][2])
-#     birthPlace <- str_replace(birthDoc,birthDate,"") 
-#     paste0(a[[1]][3],a[[1]][4],a[[1]][5],a[[1]][6])
     
-birthPlace <- birthDoc %>% 
-      str_replace(birthDate,"") %>% 
-      str_replace(",","") %>% 
+    birthPlace <- birthDoc %>%
+      str_replace(birthDate,"") %>%
+      str_replace(",","") %>%
       str_trim(.)
-#print("birthPlace")
-#print(birthPlace)
     
     
-#     ##print("summaryDoc")
-#     ##print(summaryDoc)
-#     ##print("imageDoc")
-#     ##print(imageDoc)
-    
-    info=list(imageDoc=imageDoc, summaryDoc=summaryDoc, birthPlace=birthPlace,birthDate=birthDate, birthDoc=birthDoc)
+    info = list(
+      imageDoc = imageDoc, summaryDoc = summaryDoc, birthPlace = birthPlace,birthDate =
+        birthDate, birthDoc = birthDoc
+    )
     return(info)
     
   })
   
   
-  batterData <- reactive({
-    
-    
-    
-    if (is.null(data())) return()
-    print("entered batterData")
-    
+  ##
+  batterData <- eventReactive(data(),{
     batter <- data()$batter
-    test <- batter$Runs[1]
-  #  print(test)
+    
+    
     
     colnames(batter)[12] <- "Date"
-    print("beforeboundaries")
-    print(glimpse(batter))
-    df <-  batter %>% 
-      filter(Runs!="DNB"&Runs!="TDNB") %>% 
-      mutate(Runs=str_replace(Runs,"[*]","")) %>% 
-      mutate(Runs = as.integer(Runs),SR= as.numeric(SR)) %>% 
-      mutate(Opposition=str_replace(Opposition,"v ",""))
+    
+    df <-  batter %>%
+      filter(Runs != "DNB" & Runs != "TDNB") %>%
+      mutate(Runs = str_replace(Runs,"[*]","")) %>% ## need to keep this in actually
+      mutate(Runs = as.integer(Runs),SR = as.numeric(SR)) %>%
+      mutate(Opposition = str_replace(Opposition,"v ",""))
+    
+    # Munging prob wit cols starting with number
+    
     colnames(df)[4] <- "Fours"
     df$Fours <- as.integer(df$Fours)
     colnames(df)[5] <- "Sixes"
     df$Sixes <- as.integer(df$Sixes)
-     print("glimpsedf")
-   print(glimpse(df))
+    
     
     df$id <- 1:nrow(df)
-    print(test)
-    print(str(df))
-    info=list(df=df,test=test)
+    
+    info = list(df = df)
     return(info)
   })
   
- 
-
-}) # end
-
-
+  # outlying code
+  source("code/playerPix.R", local = TRUE)
+  source("code/playerSummary.R", local = TRUE)
+  source("code/playerAtAGlance.R", local = TRUE)
+  source("code/playerBirth.R", local = TRUE)
+  source("code/playerBatting.R", local = TRUE)
+  
+})

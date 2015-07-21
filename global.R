@@ -1,4 +1,5 @@
 
+
 library(shiny)
 library(shinydashboard)
 library(httr)
@@ -26,14 +27,13 @@ library(cricketr)
 ## prob load file and update daily??
 
 testPlayers <- read_csv("allTestPlayers.csv")
-testPlayers <- testPlayers %>% 
+
+testPlayers <- testPlayers %>%
   arrange(player)
 
+# create select vectors
 playerChoice <- testPlayers$playerId
 names(playerChoice) <- testPlayers$player
 
-#print(head(playerChoice))
 
 countryChoice <- sort(unique(testPlayers$teamName))
-
-print("finished global")

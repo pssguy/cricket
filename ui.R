@@ -1,6 +1,7 @@
 
 
 
+
 dashboardPage(
   skin = "yellow",
   dashboardHeader(title = "Test Cricket"),
@@ -20,14 +21,16 @@ dashboardPage(
       
       menuItem(
         "Players", tabName = "players",icon = icon("table"),
-        menuSubItem("At A Glance", tabName = "pl_glance"),
-        menuSubItem("Batting", tabName = "pl_batting", selected=T),
-        menuSubItem("Info", tabName = "info",icon = icon("info"))
+        menuSubItem("At A Glance", tabName = "pl_glance", selected = T),
+        menuSubItem("Batting", tabName = "pl_batting")
+        
         
         
       ),
       
-      
+      menuItem("Info", tabName = "info",icon = icon("info")),
+      menuItem("Code",icon = icon("code-fork"),
+                   href = "https://github.com/pssguy/cricket"),
       
       menuItem(
         "Other Dashboards",
@@ -118,7 +121,8 @@ dashboardPage(
             fluidRow(
               tabBox(
                 # The id lets us use input$tabset1 on the server to find the current tab
-                id = "tabset1", height = "500px",title="Batting Charts- Hover Points for details", width=12,side="left",
+                id = "tabset1", height = "500px",title = "Batting Charts- Hover Points for details", width =
+                  12,side = "left",
                 tabPanel("Runs by Date",
                          ggvisOutput("pl_batByDateChart")), # could add a table here
                 tabPanel("Strike rate",
@@ -128,50 +132,26 @@ dashboardPage(
                 tabPanel("By Opposition",
                          ggvisOutput("pl_batOppCharts")),
                 tabPanel("Boundary %",
-                        ggvisOutput("pl_batBoundaries")),
+                         ggvisOutput("pl_batBoundaries")),
                 tabPanel("Raw Data",
                          DT::dataTableOutput("pl_batRaw"))
                 
-              ) #tabbox
-              ) # fluidrow
+              ) 
+            ) 
+            ), 
             
-            ), #tabItem
-              
-              
-              
-              #       tabItem("fortune",
-              #               fluidRow(
-              #                 tabBox(
-              #                   # The id lets us use input$tabset1 on the server to find the current tab
-              #                   id = "tabset1", height = "500px",
-              #                   tabPanel("Choropleth Click State for Table",
-              #                            leafletOutput("choropleth")),
-              #                   tabPanel("Locations. Click for Details",
-              #                            leafletOutput("locations")),
-              #
-              #                   tabPanel("HexBins",
-              #                            statebinOutput("statebins"))
-              #                 ),
-              #
-              #                 box(
-              #                   width = 6, status = "success", solidHeader = TRUE,
-              #                   title = "Leading Companies within State - Use with Choropleth",
-              #                   DT::dataTableOutput("table")
-              #
-              #                 )
-              #               )),
-              
-              
-              
-              tabItem("info",includeMarkdown("info.md"))
-              
-              
-              
-              
-              
-              
-              
-            ) # tabItems
-    ) # body
-    ) # page
     
+            
+            
+            tabItem("info",includeMarkdown("info.md"))
+            
+            
+            
+            
+            
+            
+            
+    ) # tabItems
+    ) # body
+  ) # page
+  
