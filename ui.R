@@ -118,7 +118,7 @@ dashboardPage(
             fluidRow(
               tabBox(
                 # The id lets us use input$tabset1 on the server to find the current tab
-                id = "tabset1", height = "500px",title="Batting Charts", width=12,side="right",
+                id = "tabset1", height = "500px",title="Batting Charts- Hover Points for details", width=12,side="left",
                 tabPanel("Runs by Date",
                          ggvisOutput("pl_batByDateChart")), # could add a table here
                 tabPanel("Strike rate",

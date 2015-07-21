@@ -4,7 +4,7 @@ shinyServer(function(input, output, session) {
   
   output$country <- renderUI ({
     inputPanel(
-    selectInput("country", "Select Countries", countryChoice, multiple=TRUE, selected = "India")
+    selectInput("country", "Select Country(ies)", countryChoice, multiple=TRUE, selected = "India")
   )
   })
   
@@ -15,7 +15,7 @@ shinyServer(function(input, output, session) {
     names(theChoice) <- testPlayers[testPlayers$teamName %in% input$country,]$player
     
     inputPanel(
-    selectizeInput("player","Select Player",theChoice,  options=list(maxOptions=10000)),
+    selectizeInput("player","Select or Type Player's Name",theChoice,  options=list(maxOptions=10000)),
     actionButton("getPlayer","Get Data")
     )
     
@@ -25,7 +25,7 @@ shinyServer(function(input, output, session) {
   source("code/playerSummary.R", local=TRUE)
   source("code/playerAtAGlance.R", local=TRUE)
   source("code/playerBirth.R", local=TRUE)
-   source("code/pl_strikeRate.R", local=TRUE)
+   source("code/playerBatting.R", local=TRUE)
   
   ## basic processing
   

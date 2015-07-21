@@ -6,8 +6,12 @@ Tinniam V Ganesh's [cricketr package](https://github.com/tvganesh/cricketr) whic
 
 ### Method
 
-Select countries for any players of interest. Currently, this just produces a dashboard
-summary of Test Performance and
+Select countries for any players of interest.
+
+Currently there is a dashboard
+summary of Test Performance and some charts of batting performance
+
+N.B Some data e.g Boundaries, Minutes batted are not available. Check raw data tab for details
   ---
   
 ### R packages used 
@@ -24,7 +28,8 @@ summary of Test Performance and
    
 ### Enhancements and Issues
 
-1. More detail and charting/tables
+1. Bowling data
+2. Comparison Analyses
 
 
    ---
