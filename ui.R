@@ -130,9 +130,13 @@ dashboardPage(
                 
                 
                 tabPanel("By Opposition",
+                         fluidRow(
+                           column(7,
                          ggvisOutput("pl_batOppCharts")),
+                         column(5,DT::dataTableOutput("pl_batCountry")))),
                 tabPanel("Boundary %",
                          ggvisOutput("pl_batBoundaries")),
+
                 tabPanel("Raw Data",
                          DT::dataTableOutput("pl_batRaw"))
                 

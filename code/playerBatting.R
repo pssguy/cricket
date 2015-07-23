@@ -9,6 +9,8 @@ observeEvent(batterData(),{
   # returned as acharacter field
   df$Date <- as.Date(df$Date, format = "%d %b %Y")
   
+  write_csv(df,"testdf.csv")
+  
   # set up tooltip
   all_values <- function(x) {
     if (is.null(x))
@@ -87,6 +89,63 @@ observeEvent(batterData(),{
     layer_points(fill = ~ Opposition) %>%
     add_tooltip(boundary_values, "hover") %>%
     bind_shiny("pl_batBoundaries")
+  
+})
+
+# table by country
+
+output$pl_batCountry <- DT::renderDataTable({
+  if(is.null(batterData())) return()
+  
+  print("enter batcountry")
+  batterData()$df 
+  
+  df <- batterData()$df 
+  
+  ## process individual columns
+  
+  sumRuns <- df %>% 
+    filter(!is.na(Runs)) %>% 
+    group_by(Opposition) %>% 
+    summarize(totRuns=sum(Runs), hs=max(Runs))
+  
+  
+  
+  sumOuts <- df %>%
+    filter(Dismissal != "not out" & Dismissal != "-") %>%
+    group_by(Opposition) %>% 
+    summarize(totOuts=n())
+  
+  
+  c <- df %>% 
+    filter(Runs>=100) %>% 
+    group_by(Opposition) %>% 
+    summarize(c=n())
+  
+  f <- df %>% 
+    filter(Runs>=50&Runs<100) %>% 
+    group_by(Opposition) %>% 
+    summarize(f=n())
+  
+  
+  
+  matches<-df %>% 
+    select(Opposition,Date) %>% 
+    unique() %>% 
+    group_by(Opposition) %>% 
+    summarize(m=n())
+  
+  summary <- 
+    sumRuns %>% 
+    inner_join(matches) %>% 
+    inner_join(sumOuts) %>% 
+    mutate(Av=round(totRuns/totOuts,2)) %>% 
+    left_join(c) %>% 
+    left_join(f) %>% 
+    select(Opposition,Mat=m,Runs=totRuns,HS=hs,Av,C=c,F=f) %>% 
+    datatable(rownames=F,options= list(paging = FALSE, searching = FALSE,info=FALSE))
+  
+  
   
 })
 

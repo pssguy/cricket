@@ -1,6 +1,4 @@
 
-
-
 shinyServer(function(input, output, session) {
   ## create input panels
   
