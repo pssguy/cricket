@@ -123,8 +123,15 @@ dashboardPage(
                 # The id lets us use input$tabset1 on the server to find the current tab
                 id = "tabset1", height = "500px",title = "Batting Charts- Hover Points for details", width =
                   12,side = "left",
-                tabPanel("Runs by Date",
-                         ggvisOutput("pl_batByDateChart")), # could add a table here
+#                 tabPanel("Runs by Date",
+#                          ggvisOutput("pl_batByDateChart")),
+                tabPanel("By Date",
+                         fluidRow(
+                           column(7,
+                                  ggvisOutput("pl_batByDateChart")),
+                           column(5,DT::dataTableOutput("pl_batYear")))),
+                
+                
                 tabPanel("Strike rate",
                          ggvisOutput("pl_strikeRate")),
                 

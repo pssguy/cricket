@@ -98,7 +98,7 @@ output$pl_batCountry <- DT::renderDataTable({
   if(is.null(batterData())) return()
   
   print("enter batcountry")
-  batterData()$df 
+  
   
   df <- batterData()$df 
   
@@ -149,7 +149,77 @@ output$pl_batCountry <- DT::renderDataTable({
   
 })
 
-
+output$pl_batYear <- DT::renderDataTable({
+  if(is.null(batterData())) return()
+  
+  print("enter batYear")
+  
+  
+  df <- batterData()$df 
+  
+  print(df$Date)
+  print(str_sub(df$Date,-4))
+  
+  df$Year <- as.integer(str_sub(df$Date,-4))
+  print("year")
+  print(df$Year)
+  
+  ## process individual columns
+  
+  sumRuns <- df %>% 
+    filter(!is.na(Runs)) %>% 
+    group_by(Year) %>% 
+    summarize(totRuns=sum(Runs), hs=max(Runs))
+  print(sumRuns)
+  
+  
+  sumOuts <- df %>%
+    filter(Dismissal != "not out" & Dismissal != "-") %>%
+    group_by(Year) %>% 
+    summarize(totOuts=n())
+  print(sumOuts)
+  
+  c <- df %>% 
+    filter(Runs>=100) %>% 
+    group_by(Year) %>% 
+    summarize(c=n())
+  print(c)
+  
+  f <- df %>% 
+    filter(Runs>=50&Runs<100) %>% 
+    group_by(Year) %>% 
+    summarize(f=n())
+  print(f)
+  
+  
+  
+  matches<-df %>% 
+    select(Year,Date) %>% 
+    unique() %>% 
+    group_by(Year) %>% 
+    summarize(m=n())
+  print(matches)
+  
+  
+  summary <- 
+    sumRuns %>% 
+    inner_join(matches) %>% 
+    inner_join(sumOuts) %>% 
+    mutate(Av=round(totRuns/totOuts,2)) %>% 
+    left_join(c) %>% 
+    left_join(f) %>% 
+    select(Year,Mat=m,Runs=totRuns,HS=hs,Av,Cen=c,Fifty=f)
+  
+  print(glimpse(summary))
+  
+  summary[is.na(summary$Cen),]$Cen <- 0
+  summary[is.na(summary$Fifty),]$Fifty <- 0
+  
+  summary %>% 
+    datatable(rownames=F,options= list( searching = FALSE,info=FALSE))  
+  
+  
+})
 
 ## rawData
 
