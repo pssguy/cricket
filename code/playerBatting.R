@@ -135,16 +135,47 @@ output$pl_batCountry <- DT::renderDataTable({
     group_by(Opposition) %>% 
     summarize(m=n())
   
+  
   summary <- 
     sumRuns %>% 
     inner_join(matches) %>% 
     inner_join(sumOuts) %>% 
     mutate(Av=round(totRuns/totOuts,2)) %>% 
     left_join(c) %>% 
-    left_join(f) %>% 
-    select(Opposition,Mat=m,Runs=totRuns,HS=hs,Av,C=c,F=f) %>% 
-    datatable(rownames=F,options= list(paging = FALSE, searching = FALSE,info=FALSE))
+    left_join(f) 
   
+  
+  summary[is.na(summary$c),]$c <- 0
+  summary[is.na(summary$f),]$f <- 0
+  
+  total <- summary %>% 
+    summarize(m=sum(m),totRuns=sum(totRuns), hs=max(hs),Av=sprintf("%3.2f", totRuns/sum(totOuts)),c=sum(c),f=sum(f))
+  
+  total<-cbind(Year="Career",total)
+  
+  
+  summary <- summary %>% 
+    select(-totOuts) 
+  
+  summary <- rbind(summary,total)
+  
+  summary %>% 
+    select(Year,Tests=m,Runs=totRuns,HS=hs,Av,C=c,F=f) %>% 
+    datatable(rownames=F,colnames = c('Opposition', 'Tests', 'Runs', 'HS', 'Av','100','50'),
+              options= list(paging = FALSE, searching = FALSE,info=FALSE))
+                                                                   
+  
+#   summary <- 
+#     sumRuns %>% 
+#     inner_join(matches) %>% 
+#     inner_join(sumOuts) %>% 
+#     mutate(Av=round(totRuns/totOuts,2)) %>% 
+#     left_join(c) %>% 
+#     left_join(f) %>% 
+#     select(Opposition,Mat=m,Runs=totRuns,HS=hs,Av,C=c,F=f) %>% 
+#     datatable(rownames=F,colnames = c('Opposition', 'Tests', 'Runs', 'HS', 'Av','100','50'),options= list(paging = FALSE, searching = FALSE,info=FALSE
+#                                        ))
+#   
   
   
 })
@@ -152,17 +183,15 @@ output$pl_batCountry <- DT::renderDataTable({
 output$pl_batYear <- DT::renderDataTable({
   if(is.null(batterData())) return()
   
-  print("enter batYear")
+  
   
   
   df <- batterData()$df 
   
-  print(df$Date)
-  print(str_sub(df$Date,-4))
+ 
   
   df$Year <- as.integer(str_sub(df$Date,-4))
-  print("year")
-  print(df$Year)
+  
   
   ## process individual columns
   
@@ -170,26 +199,26 @@ output$pl_batYear <- DT::renderDataTable({
     filter(!is.na(Runs)) %>% 
     group_by(Year) %>% 
     summarize(totRuns=sum(Runs), hs=max(Runs))
-  print(sumRuns)
+
   
   
   sumOuts <- df %>%
     filter(Dismissal != "not out" & Dismissal != "-") %>%
     group_by(Year) %>% 
     summarize(totOuts=n())
-  print(sumOuts)
+  
   
   c <- df %>% 
     filter(Runs>=100) %>% 
     group_by(Year) %>% 
     summarize(c=n())
-  print(c)
+  
   
   f <- df %>% 
     filter(Runs>=50&Runs<100) %>% 
     group_by(Year) %>% 
     summarize(f=n())
-  print(f)
+  
   
   
   
@@ -198,26 +227,63 @@ output$pl_batYear <- DT::renderDataTable({
     unique() %>% 
     group_by(Year) %>% 
     summarize(m=n())
-  print(matches)
+  
   
   
   summary <- 
     sumRuns %>% 
     inner_join(matches) %>% 
     inner_join(sumOuts) %>% 
-    mutate(Av=round(totRuns/totOuts,2)) %>% 
+    mutate(Av=sprintf("%3.2f", totRuns/totOuts)) %>% 
     left_join(c) %>% 
-    left_join(f) %>% 
-    select(Year,Mat=m,Runs=totRuns,HS=hs,Av,Cen=c,Fifty=f)
+    left_join(f)
   
-  print(glimpse(summary))
   
-  summary[is.na(summary$Cen),]$Cen <- 0
-  summary[is.na(summary$Fifty),]$Fifty <- 0
+  
+  
+  
+  
+  summary[is.na(summary$c),]$c <- 0
+  summary[is.na(summary$f),]$f <- 0
+  
+  total <- summary %>% 
+    summarize(m=sum(m),totRuns=sum(totRuns), hs=max(hs),Av=sprintf("%3.2f", totRuns/sum(totOuts)),c=sum(c),f=sum(f))
+  
+  total<-cbind(Year="Career",total)
+  
+ 
+  summary <- summary %>% 
+    select(-totOuts) 
+  
+  summary <- rbind(summary,total)
   
   summary %>% 
-    datatable(rownames=F,options= list( searching = FALSE,info=FALSE))  
+    select(Year,Tests=m,Runs=totRuns,HS=hs,Av,C=c,F=f) %>% 
+    datatable(rownames=F,colnames = c('Year', 'Tests', 'Runs', 'HS', 'Av','100','50'),
+              options= list(searching = FALSE,info=FALSE,
+                            columnDefs = list(list(className = 'dt-center', targets = 0)),
+                            pageLength = 10,
+                            lengthMenu = c(5, 10)))
   
+#   summary <- 
+#     sumRuns %>% 
+#     inner_join(matches) %>% 
+#     inner_join(sumOuts) %>% 
+#     mutate(Av=round(totRuns/totOuts,2)) %>% 
+#     left_join(c) %>% 
+#     left_join(f) %>% 
+#     select(Year,Mat=m,Runs=totRuns,HS=hs,Av,Cen=c,Fifty=f)
+#   
+#  
+#   
+#   summary[is.na(summary$Cen),]$Cen <- 0
+#   summary[is.na(summary$Fifty),]$Fifty <- 0
+#   
+#   print(glimpse(summary))
+#   
+#   summary %>% 
+#     datatable(rownames=F,options= list( searching = FALSE,info=FALSE))  
+#   
   
 })
 
