@@ -21,6 +21,7 @@ library(shinythemes)
 library(DT)
 library(readr)
 library(ggmap)
+library(rd3pie)
 
 library(cricketr)
 

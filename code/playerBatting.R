@@ -2,6 +2,7 @@
 
 
 
+
 observeEvent(batterData(),{
   # simplify code
   df <- batterData()$df
@@ -21,14 +22,14 @@ observeEvent(batterData(),{
   
   # Series of ggvis charts
   df %>%
-    ggvis( ~ Runs, ~ SR, key:= ~ id) %>%
+    ggvis(~ Runs, ~ SR, key := ~ id) %>%
     layer_points(size = 1, fill = ~ Opposition) %>%
     
     add_tooltip(all_values, "hover") %>%
     bind_shiny("pl_strikeRate")
   
   df %>%
-    ggvis( ~ Date, ~ Runs, key:= ~ id) %>%
+    ggvis(~ Date, ~ Runs, key := ~ id) %>%
     layer_points(size = 1, fill = ~ Opposition) %>%
     add_tooltip(all_values, "hover") %>%
     bind_shiny("pl_batByDateChart")
@@ -58,7 +59,7 @@ observeEvent(batterData(),{
   
   if (nrow(dfOppSR) > 0) {
     dfOppSR %>%
-      ggvis( ~ avRuns, ~ avSR,fill =  ~ Opposition, key:= ~ id) %>%
+      ggvis(~ avRuns, ~ avSR,fill =  ~ Opposition, key := ~ id) %>%
       layer_points(size = ~ sqrt(inns)) %>%
       hide_legend("size") %>%
       add_tooltip(opp_values, "hover") %>%
@@ -85,157 +86,186 @@ observeEvent(batterData(),{
   }
   
   df_Boundaries %>%
-    ggvis( ~ Runs, ~ pc, key:= ~ id) %>%
+    ggvis(~ Runs, ~ pc, key := ~ id) %>%
     layer_points(fill = ~ Opposition) %>%
     add_tooltip(boundary_values, "hover") %>%
     bind_shiny("pl_batBoundaries")
   
+  ## dismissals
+  df$Dismissal <- factor(df$Dismissal, levels = c("bowled", "caught", "lbw", "run out", "stumped","not out"))
+  
+  
+  dfChart <- df %>% 
+    filter(Dismissal != "-") 
+  
+  dfChart$Dismissal <- factor(dfChart$Dismissal, levels = c("bowled", "caught", "lbw", "run out", "stumped","not out"))
+  
+                              dfChart %>% 
+                                ggvis(~Dismissal, ~Runs) %>% 
+                                layer_points(size=2, fill= ~Opposition) %>% 
+                                add_axis("x", title="Method of Dismissal")  %>%
+                                bind_shiny("pl_batDismissals")
+  
 })
+
+## piechart
+output$pl_batDismissalsPie <- renderRd3pie({
+  
+  dfPie <- batterData()$df %>% 
+    filter(Dismissal != "-") %>% 
+    group_by(Dismissal) %>% 
+    tally() %>% 
+    mutate(Dismissal=as.character(Dismissal))
+  
+  dfPie %>% 
+    rename(label=Dismissal,value=n) %>% 
+    rd3pie(Title="Dismissal Method",  OuterRadius=NULL, width=1,height=10)
+  
+})
+
 
 # table by country
 
 output$pl_batCountry <- DT::renderDataTable({
-  if(is.null(batterData())) return()
+  if (is.null(batterData()))
+    return()
   
   print("enter batcountry")
   
   
-  df <- batterData()$df 
+  df <- batterData()$df
   
   ## process individual columns
   
-  sumRuns <- df %>% 
-    filter(!is.na(Runs)) %>% 
-    group_by(Opposition) %>% 
-    summarize(totRuns=sum(Runs), hs=max(Runs))
+  sumRuns <- df %>%
+    filter(!is.na(Runs)) %>%
+    group_by(Opposition) %>%
+    summarize(totRuns = sum(Runs), hs = max(Runs))
   
   
   
   sumOuts <- df %>%
     filter(Dismissal != "not out" & Dismissal != "-") %>%
-    group_by(Opposition) %>% 
-    summarize(totOuts=n())
+    group_by(Opposition) %>%
+    summarize(totOuts = n())
   
   
-  c <- df %>% 
-    filter(Runs>=100) %>% 
-    group_by(Opposition) %>% 
-    summarize(c=n())
+  c <- df %>%
+    filter(Runs >= 100) %>%
+    group_by(Opposition) %>%
+    summarize(c = n())
   
-  f <- df %>% 
-    filter(Runs>=50&Runs<100) %>% 
-    group_by(Opposition) %>% 
-    summarize(f=n())
-  
-  
-  
-  matches<-df %>% 
-    select(Opposition,Date) %>% 
-    unique() %>% 
-    group_by(Opposition) %>% 
-    summarize(m=n())
+  f <- df %>%
+    filter(Runs >= 50 & Runs < 100) %>%
+    group_by(Opposition) %>%
+    summarize(f = n())
   
   
-  summary <- 
-    sumRuns %>% 
-    inner_join(matches) %>% 
-    inner_join(sumOuts) %>% 
-    mutate(Av=round(totRuns/totOuts,2)) %>% 
-    left_join(c) %>% 
-    left_join(f) 
+  
+  matches <- df %>%
+    select(Opposition,Date) %>%
+    unique() %>%
+    group_by(Opposition) %>%
+    summarize(m = n())
+  
+  
+  summary <-
+    sumRuns %>%
+    inner_join(matches) %>%
+    inner_join(sumOuts) %>%
+    mutate(Av = round(totRuns / totOuts,2)) %>%
+    left_join(c) %>%
+    left_join(f)
   
   
   summary[is.na(summary$c),]$c <- 0
   summary[is.na(summary$f),]$f <- 0
   
-  total <- summary %>% 
-    summarize(m=sum(m),totRuns=sum(totRuns), hs=max(hs),Av=sprintf("%3.2f", totRuns/sum(totOuts)),c=sum(c),f=sum(f))
+  total <- summary %>%
+    summarize(
+      m = sum(m),totRuns = sum(totRuns), hs = max(hs),Av = sprintf("%3.2f", totRuns /
+                                                                     sum(totOuts)),c = sum(c),f = sum(f)
+    )
   
-  total<-cbind(Year="Career",total)
+  total <- cbind(Year = "Career",total)
   
   
-  summary <- summary %>% 
-    select(-totOuts) 
+  summary <- summary %>%
+    select(-totOuts)
   
   summary <- rbind(summary,total)
   
-  summary %>% 
-    select(Year,Tests=m,Runs=totRuns,HS=hs,Av,C=c,F=f) %>% 
-    datatable(rownames=F,colnames = c('Opposition', 'Tests', 'Runs', 'HS', 'Av','100','50'),
-              options= list(paging = FALSE, searching = FALSE,info=FALSE))
-                                                                   
+  summary %>%
+    select(
+      Year,Tests = m,Runs = totRuns,HS = hs,Av,C = c,F = f
+    ) %>%
+    datatable(
+      rownames = F,colnames = c('Opposition', 'Tests', 'Runs', 'HS', 'Av','100','50'),
+      options = list(
+        paging = FALSE, searching = FALSE,info = FALSE
+      )
+    )
   
-#   summary <- 
-#     sumRuns %>% 
-#     inner_join(matches) %>% 
-#     inner_join(sumOuts) %>% 
-#     mutate(Av=round(totRuns/totOuts,2)) %>% 
-#     left_join(c) %>% 
-#     left_join(f) %>% 
-#     select(Opposition,Mat=m,Runs=totRuns,HS=hs,Av,C=c,F=f) %>% 
-#     datatable(rownames=F,colnames = c('Opposition', 'Tests', 'Runs', 'HS', 'Av','100','50'),options= list(paging = FALSE, searching = FALSE,info=FALSE
-#                                        ))
-#   
+  
+  
   
   
 })
 
 output$pl_batYear <- DT::renderDataTable({
-  if(is.null(batterData())) return()
+  if (is.null(batterData()))
+    return()
+  
+  df <- batterData()$df
   
   
-  
-  
-  df <- batterData()$df 
-  
- 
   
   df$Year <- as.integer(str_sub(df$Date,-4))
   
   
   ## process individual columns
   
-  sumRuns <- df %>% 
-    filter(!is.na(Runs)) %>% 
-    group_by(Year) %>% 
-    summarize(totRuns=sum(Runs), hs=max(Runs))
-
+  sumRuns <- df %>%
+    filter(!is.na(Runs)) %>%
+    group_by(Year) %>%
+    summarize(totRuns = sum(Runs), hs = max(Runs))
+  
   
   
   sumOuts <- df %>%
     filter(Dismissal != "not out" & Dismissal != "-") %>%
-    group_by(Year) %>% 
-    summarize(totOuts=n())
+    group_by(Year) %>%
+    summarize(totOuts = n())
   
   
-  c <- df %>% 
-    filter(Runs>=100) %>% 
-    group_by(Year) %>% 
-    summarize(c=n())
+  c <- df %>%
+    filter(Runs >= 100) %>%
+    group_by(Year) %>%
+    summarize(c = n())
   
   
-  f <- df %>% 
-    filter(Runs>=50&Runs<100) %>% 
-    group_by(Year) %>% 
-    summarize(f=n())
-  
-  
-  
-  
-  matches<-df %>% 
-    select(Year,Date) %>% 
-    unique() %>% 
-    group_by(Year) %>% 
-    summarize(m=n())
+  f <- df %>%
+    filter(Runs >= 50 & Runs < 100) %>%
+    group_by(Year) %>%
+    summarize(f = n())
   
   
   
-  summary <- 
-    sumRuns %>% 
-    inner_join(matches) %>% 
-    inner_join(sumOuts) %>% 
-    mutate(Av=sprintf("%3.2f", totRuns/totOuts)) %>% 
-    left_join(c) %>% 
+  
+  matches <- df %>%
+    select(Year,Date) %>%
+    unique() %>%
+    group_by(Year) %>%
+    summarize(m = n())
+  
+  
+  
+  summary <-
+    sumRuns %>%
+    inner_join(matches) %>%
+    inner_join(sumOuts) %>%
+    mutate(Av = sprintf("%3.2f", totRuns / totOuts)) %>%
+    left_join(c) %>%
     left_join(f)
   
   
@@ -246,44 +276,37 @@ output$pl_batYear <- DT::renderDataTable({
   summary[is.na(summary$c),]$c <- 0
   summary[is.na(summary$f),]$f <- 0
   
-  total <- summary %>% 
-    summarize(m=sum(m),totRuns=sum(totRuns), hs=max(hs),Av=sprintf("%3.2f", totRuns/sum(totOuts)),c=sum(c),f=sum(f))
+  total <- summary %>%
+    summarize(
+      m = sum(m),totRuns = sum(totRuns), hs = max(hs),Av = sprintf("%3.2f", totRuns /
+                                                                     sum(totOuts)),c = sum(c),f = sum(f)
+    )
   
-  total<-cbind(Year="Career",total)
+  total <- cbind(Year = "Career",total)
   
- 
-  summary <- summary %>% 
-    select(-totOuts) 
+  
+  summary <- summary %>%
+    select(-totOuts)
   
   summary <- rbind(summary,total)
   
-  summary %>% 
-    select(Year,Tests=m,Runs=totRuns,HS=hs,Av,C=c,F=f) %>% 
-    datatable(rownames=F,colnames = c('Year', 'Tests', 'Runs', 'HS', 'Av','100','50'),
-              options= list(searching = FALSE,info=FALSE,
-                            columnDefs = list(list(className = 'dt-center', targets = 0)),
-                            pageLength = 10,
-                            lengthMenu = c(5, 10)))
+  summary %>%
+    select(
+      Year,Tests = m,Runs = totRuns,HS = hs,Av,C = c,F = f
+    ) %>%
+    datatable(
+      rownames = F,colnames = c('Year', 'Tests', 'Runs', 'HS', 'Av','100','50'),
+      options = list(
+        searching = FALSE,info = FALSE,
+        columnDefs = list(list(
+          className = 'dt-center', targets = 0
+        )),
+        pageLength = 10,
+        lengthMenu = c(5, 10)
+      )
+    )
   
-#   summary <- 
-#     sumRuns %>% 
-#     inner_join(matches) %>% 
-#     inner_join(sumOuts) %>% 
-#     mutate(Av=round(totRuns/totOuts,2)) %>% 
-#     left_join(c) %>% 
-#     left_join(f) %>% 
-#     select(Year,Mat=m,Runs=totRuns,HS=hs,Av,Cen=c,Fifty=f)
-#   
-#  
-#   
-#   summary[is.na(summary$Cen),]$Cen <- 0
-#   summary[is.na(summary$Fifty),]$Fifty <- 0
-#   
-#   print(glimpse(summary))
-#   
-#   summary %>% 
-#     datatable(rownames=F,options= list( searching = FALSE,info=FALSE))  
-#   
+ 
   
 })
 

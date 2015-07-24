@@ -2,6 +2,7 @@
 
 
 
+
 dashboardPage(
   skin = "yellow",
   dashboardHeader(title = "Test Cricket"),
@@ -30,7 +31,7 @@ dashboardPage(
       
       menuItem("Info", tabName = "info",icon = icon("info")),
       menuItem("Code",icon = icon("code-fork"),
-                   href = "https://github.com/pssguy/cricket"),
+               href = "https://github.com/pssguy/cricket"),
       
       menuItem(
         "Other Dashboards",
@@ -123,13 +124,14 @@ dashboardPage(
                 # The id lets us use input$tabset1 on the server to find the current tab
                 id = "tabset1", height = "500px",title = "Batting Charts- Hover Points for details", width =
                   12,side = "left",
-#                 tabPanel("Runs by Date",
-#                          ggvisOutput("pl_batByDateChart")),
+                #                 tabPanel("Runs by Date",
+                #                          ggvisOutput("pl_batByDateChart")),
                 tabPanel("By Date",
                          fluidRow(
                            column(7,
                                   ggvisOutput("pl_batByDateChart")),
-                           column(5,DT::dataTableOutput("pl_batYear")))),
+                           column(5,DT::dataTableOutput("pl_batYear"))
+                         )),
                 
                 
                 tabPanel("Strike rate",
@@ -139,30 +141,36 @@ dashboardPage(
                 tabPanel("By Opposition",
                          fluidRow(
                            column(7,
-                         ggvisOutput("pl_batOppCharts")),
-                         column(5,DT::dataTableOutput("pl_batCountry")))),
+                                  ggvisOutput("pl_batOppCharts")),
+                           column(5,DT::dataTableOutput("pl_batCountry"))
+                         )),
                 tabPanel("Boundary %",
                          ggvisOutput("pl_batBoundaries")),
-
+                tabPanel("Dismissal Method",
+                         fluidRow(
+                           column(7,
+                                  ggvisOutput("pl_batDismissals")),
+                           column(5,rd3pieOutput("pl_batDismissalsPie"))
+                         )),
+                
                 tabPanel("Raw Data",
                          DT::dataTableOutput("pl_batRaw"))
                 
-              ) 
-            ) 
-            ), 
-            
+              )
+            )),
     
-            
-            
-            tabItem("info",includeMarkdown("info.md"))
-            
-            
-            
-            
-            
-            
-            
-    ) # tabItems
-    ) # body
+    
+    
+    
+    tabItem("info",includeMarkdown("info.md"))
+    
+    
+    
+    
+    
+    
+    
+  ) # tabItems
+  ) # body
   ) # page
   
