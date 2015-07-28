@@ -140,11 +140,49 @@ shinyServer(function(input, output, session) {
     return(info)
   })
   
+  
+  bowlerData <- eventReactive(data(),{
+    bowler <- data()$bowler
+    
+    
+    
+    colnames(bowler)[10] <- "Date"
+    
+    print(bowler)
+    
+    df <- bowler
+    
+#     df <-  batter %>%
+#       filter(Runs != "DNB" & Runs != "TDNB") %>%
+#       mutate(Runs = str_replace(Runs,"[*]","")) %>% ## need to keep this in actually
+#       mutate(Runs = as.integer(Runs),SR = as.numeric(SR)) %>%
+#       mutate(Opposition = str_replace(Opposition,"v ",""))
+#     
+#     # Munging prob wit cols starting with number
+#     
+#     colnames(df)[4] <- "Fours"
+#     df$Fours <- as.integer(df$Fours)
+#     colnames(df)[5] <- "Sixes"
+#     df$Sixes <- as.integer(df$Sixes)
+#     
+    
+    df$id <- 1:nrow(df)
+    
+    info = list(df = df)
+    return(info)
+  })
+  
+  
+  
+  
+  
+  
   # outlying code
   source("code/playerPix.R", local = TRUE)
   source("code/playerSummary.R", local = TRUE)
   source("code/playerAtAGlance.R", local = TRUE)
   source("code/playerBirth.R", local = TRUE)
   source("code/playerBatting.R", local = TRUE)
+  source("code/playerBowling.R", local = TRUE)
   
 })
