@@ -130,7 +130,7 @@
 #   if (is.null(batterData()))
 #     return()
 #   
-#   print("enter batcountry")
+#   #print("enter batcountry")
 #   
 #   
 #   df <- batterData()$df
@@ -183,7 +183,7 @@
 #   
 #   total <- summary %>%
 #     summarize(
-#       m = sum(m),totRuns = sum(totRuns), hs = max(hs),Av = sprintf("%3.2f", totRuns /
+#       m = sum(m),totRuns = sum(totRuns), hs = max(hs),Av = s#printf("%3.2f", totRuns /
 #                                                                      sum(totOuts)),c = sum(c),f = sum(f)
 #     )
 #   
@@ -264,7 +264,7 @@
 #     sumRuns %>%
 #     inner_join(matches) %>%
 #     inner_join(sumOuts) %>%
-#     mutate(Av = sprintf("%3.2f", totRuns / totOuts)) %>%
+#     mutate(Av = s#printf("%3.2f", totRuns / totOuts)) %>%
 #     left_join(c) %>%
 #     left_join(f)
 #   
@@ -278,7 +278,7 @@
 #   
 #   total <- summary %>%
 #     summarize(
-#       m = sum(m),totRuns = sum(totRuns), hs = max(hs),Av = sprintf("%3.2f", totRuns /
+#       m = sum(m),totRuns = sum(totRuns), hs = max(hs),Av = s#printf("%3.2f", totRuns /
 #                                                                      sum(totOuts)),c = sum(c),f = sum(f)
 #     )
 #   

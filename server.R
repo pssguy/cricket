@@ -47,16 +47,20 @@ shinyServer(function(input, output, session) {
     bowler <- getPlayerData(profile = input$player,type = "bowling")
     
     batter <- getPlayerData(profile = input$player,type = "batting")
+    batterOD <- getPlayerDataOD(profile = input$player,type = "batting")
+    
+    print(glimpse(batterOD))
     
     
     ## cannot have space in colname
     colnames(batter)[12] <- "startDate"
     colnames(bowler)[10] <- "startDate"
+    colnames(batterOD)[12] <- "startDate"
     
     
     
     
-    info = list(playerId = playerId,batter = batter,bowler = bowler)
+    info = list(playerId = playerId,batter = batter,bowler = bowler,batterOD=batterOD)
     return(info)
     
   })
@@ -141,6 +145,35 @@ shinyServer(function(input, output, session) {
   })
   
   
+  ##
+  batterODData <- eventReactive(data(),{
+    batter <- data()$batterOD
+    
+    
+    
+    colnames(batter)[12] <- "Date"
+    
+    df <-  batter %>%
+      filter(Runs != "DNB" & Runs != "TDNB") %>%
+      mutate(Runs = str_replace(Runs,"[*]","")) %>% ## need to keep this in actually
+      mutate(Runs = as.integer(Runs),SR = as.numeric(SR)) %>%
+      mutate(Opposition = str_replace(Opposition,"v ",""))
+    
+    # Munging prob wit cols starting with number
+    
+    colnames(df)[4] <- "Fours"
+    df$Fours <- as.integer(df$Fours)
+    colnames(df)[5] <- "Sixes"
+    df$Sixes <- as.integer(df$Sixes)
+    
+    
+    df$id <- 1:nrow(df)
+    
+    info = list(df = df)
+    return(info)
+  })
+  
+  
   bowlerData <- eventReactive(data(),{
     bowler <- data()$bowler
     
@@ -148,7 +181,7 @@ shinyServer(function(input, output, session) {
     
     colnames(bowler)[10] <- "Date"
     
-    print(bowler)
+    #print(bowler)
     
     df <- bowler
     
@@ -184,5 +217,6 @@ shinyServer(function(input, output, session) {
   source("code/playerBirth.R", local = TRUE)
   source("code/playerBatting.R", local = TRUE)
   source("code/playerBowling.R", local = TRUE)
+  source("code/playerBattingOD.R", local = TRUE)
   
 })

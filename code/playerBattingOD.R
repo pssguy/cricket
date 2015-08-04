@@ -1,8 +1,8 @@
 
 
-observeEvent(batterData(),{
+observeEvent(batterODData(),{
   # simplify code
-  df <- batterData()$df
+  df <- batterODData()$df
   
   # returned as acharacter field
   df$Date <- as.Date(df$Date, format = "%d %b %Y")
@@ -23,13 +23,13 @@ observeEvent(batterData(),{
     layer_points(size = 1, fill = ~ Opposition) %>%
     
     add_tooltip(all_values, "hover") %>%
-    bind_shiny("pl_strikeRate")
+    bind_shiny("plOD_strikeRate")
   
   df %>%
     ggvis(~ Date, ~ Runs, key := ~ id) %>%
     layer_points(size = 1, fill = ~ Opposition) %>%
     add_tooltip(all_values, "hover") %>%
-    bind_shiny("pl_batByDateChart")
+    bind_shiny("plOD_batByDateChart")
   
   
   
@@ -62,7 +62,7 @@ observeEvent(batterData(),{
       add_tooltip(opp_values, "hover") %>%
       add_axis("x",title = "Batting Average") %>%
       add_axis("y", title = "Average Strike Rate") %>%
-      bind_shiny("pl_batOppCharts")
+      bind_shiny("plOD_batOppCharts")
   }
   
   
@@ -86,7 +86,7 @@ observeEvent(batterData(),{
     ggvis(~ Runs, ~ pc, key := ~ id) %>%
     layer_points(fill = ~ Opposition) %>%
     add_tooltip(boundary_values, "hover") %>%
-    bind_shiny("pl_batBoundaries")
+    bind_shiny("plOD_batBoundaries")
   
   ## dismissals
   df$Dismissal <- factor(df$Dismissal, levels = c("bowled", "caught", "lbw", "run out", "stumped","not out"))
@@ -101,14 +101,14 @@ observeEvent(batterData(),{
                                 ggvis(~Dismissal, ~Runs) %>% 
                                 layer_points(size=2, fill= ~Opposition) %>% 
                                 add_axis("x", title="Method of Dismissal")  %>%
-                                bind_shiny("pl_batDismissals")
+                                bind_shiny("plOD_batDismissals")
   
 })
 
 ## piechart
 output$pl_batDismissalsPie <- renderRd3pie({
   
-  dfPie <- batterData()$df %>% 
+  dfPie <- batterODData()$df %>% 
     filter(Dismissal != "-") %>% 
     group_by(Dismissal) %>% 
     tally() %>% 
@@ -123,14 +123,14 @@ output$pl_batDismissalsPie <- renderRd3pie({
 
 # table by country
 
-output$pl_batCountry <- DT::renderDataTable({
-  if (is.null(batterData()))
+output$plOD_batCountry <- DT::renderDataTable({
+  if (is.null(batterODData()))
     return()
   
   #print("enter batcountry")
   
   
-  df <- batterData()$df
+  df <- batterODData()$df
   
   ## process individual columns
   
@@ -197,7 +197,7 @@ output$pl_batCountry <- DT::renderDataTable({
       Year,Tests = m,Runs = totRuns,HS = hs,Av,C = c,F = f
     ) %>%
     datatable(
-      rownames = F,colnames = c('Opposition', 'Tests', 'Runs', 'HS', 'Av','100','50'),
+      rownames = F,colnames = c('Opposition', 'ODI', 'Runs', 'HS', 'Av','100','50'),
       options = list(
         paging = FALSE, searching = FALSE,info = FALSE
       )
@@ -209,11 +209,11 @@ output$pl_batCountry <- DT::renderDataTable({
   
 })
 
-output$pl_batYear <- DT::renderDataTable({
-  if (is.null(batterData()))
+output$plOD_batYear <- DT::renderDataTable({
+  if (is.null(batterODData()))
     return()
-  print("enterpl_batyear")
-  df <- batterData()$df
+  
+  df <- batterODData()$df
   
   
   
@@ -292,7 +292,7 @@ output$pl_batYear <- DT::renderDataTable({
       Year,Tests = m,Runs = totRuns,HS = hs,Av,C = c,F = f
     ) %>%
     datatable(
-      rownames = F,colnames = c('Year', 'Tests', 'Runs', 'HS', 'Av','100','50'),
+      rownames = F,colnames = c('Year', 'ODI', 'Runs', 'HS', 'Av','100','50'),
       options = list(
         searching = FALSE,info = FALSE,
         columnDefs = list(list(
@@ -309,11 +309,11 @@ output$pl_batYear <- DT::renderDataTable({
 
 ## rawData
 
-output$pl_batRaw <- DT::renderDataTable({
-  if (is.null(batterData()))
+output$plOD_batRaw <- DT::renderDataTable({
+  if (is.null(batterODData()))
     return()
   
-  batterData()$df %>%
+  batterODData()$df %>%
     select(Date,Opposition,Ground,Inns,Order = Pos,Dismissal,Runs,Mins,BF,SR) %>%
     DT::datatable()
   

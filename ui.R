@@ -5,7 +5,7 @@
 
 dashboardPage(
   skin = "yellow",
-  dashboardHeader(title = "Test Cricket"),
+  dashboardHeader(title = "International Cricket"),
   
   dashboardSidebar(
     includeCSS("custom.css"),
@@ -22,8 +22,10 @@ dashboardPage(
       
       menuItem(
         "Players", tabName = "players",icon = icon("table"),
-        menuSubItem("At A Glance", tabName = "pl_glance", selected = T),
-        menuSubItem("Batting", tabName = "pl_batting")
+        menuSubItem("At A Glance", tabName = "pl_glance"),
+        menuSubItem("Test Batting", tabName = "pl_batting"),
+        menuSubItem("ODI Batting", tabName = "plOD_batting"),
+        menuSubItem("Bowling", tabName = "pl_bowling", selected = T)
         
         
         
@@ -109,12 +111,7 @@ dashboardPage(
     ),
     
     
-    #       tabItem("pl_batting",
-    #               box(
-    #                 textOutput("test"),
-    #                 ggvisOutput("pl_strikeRate")
-    #
-    #               )),
+    
     
     
     tabItem("pl_batting",
@@ -122,7 +119,7 @@ dashboardPage(
             fluidRow(
               tabBox(
                 # The id lets us use input$tabset1 on the server to find the current tab
-                id = "tabset1", height = "500px",title = "Batting Charts- Hover Points for details", width =
+                id = "tabset1", height = "500px",title = "Test Batting Charts- Hover Points for details", width =
                   12,side = "left",
                 #                 tabPanel("Runs by Date",
                 #                          ggvisOutput("pl_batByDateChart")),
@@ -160,6 +157,88 @@ dashboardPage(
             )),
     
     
+    tabItem("plOD_batting",
+            
+            fluidRow(
+              tabBox(
+                # The id lets us use input$tabset1 on the server to find the current tab
+                id = "tabset1OD", height = "500px",title = "ODI Batting Charts- Hover Points for details", width =
+                  12,side = "left",
+                
+                tabPanel("By Date",
+                         fluidRow(
+                           column(7,
+                                  ggvisOutput("plOD_batByDateChart")),
+                           column(5,DT::dataTableOutput("plOD_batYear"))
+                         )),
+                
+                
+                tabPanel("Strike rate",
+                         ggvisOutput("plOD_strikeRate")),
+                
+                
+                tabPanel("By Opposition",
+                         fluidRow(
+                           column(7,
+                                  ggvisOutput("plOD_batOppCharts")),
+                           column(5,DT::dataTableOutput("plOD_batCountry"))
+                         )),
+                tabPanel("Boundary %",
+                         ggvisOutput("plOD_batBoundaries")),
+                tabPanel("Dismissal Method",
+                         fluidRow(
+                           column(7,
+                                  ggvisOutput("plOD_batDismissals")),
+                           column(5,rd3pieOutput("plOD_batDismissalsPie"))
+                         )),
+                
+                tabPanel("Raw Data",
+                         DT::dataTableOutput("plOD_batRaw"))
+                
+              )
+            )),
+    
+    
+    tabItem("pl_bowling",
+            
+            fluidRow(
+              tabBox(
+                # The id lets us use input$tabset1 on the server to find the current tab
+                id = "tabset1", height = "500px",title = "Bowling Charts- Hover Points for details", width =
+                  12,side = "left",
+               
+#                 tabPanel("By Date",
+#                          fluidRow(
+#                            column(7,
+#                                   ggvisOutput("pl_batByDateChart")),
+#                            column(5,DT::dataTableOutput("pl_batYear"))
+#                          )),
+#                 
+#                 
+#                 tabPanel("Strike rate",
+#                          ggvisOutput("pl_strikeRate")),
+#                 
+#                 
+#                 tabPanel("By Opposition",
+#                          fluidRow(
+#                            column(7,
+#                                   ggvisOutput("pl_batOppCharts")),
+#                            column(5,DT::dataTableOutput("pl_batCountry"))
+#                          )),
+#                 tabPanel("Boundary %",
+#                          ggvisOutput("pl_batBoundaries")),
+#                 tabPanel("Dismissal Method",
+#                          fluidRow(
+#                            column(7,
+#                                   ggvisOutput("pl_batDismissals")),
+#                            column(5,rd3pieOutput("pl_batDismissalsPie"))
+#                          )),
+                
+                tabPanel("Raw Data",
+                         DT::dataTableOutput("pl_bowlRaw"))
+                
+              )
+            )),
     
     
     tabItem("info",includeMarkdown("info.md"))
